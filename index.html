@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antipsychotic Dose Equivalent Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────
+   DESIGN SYSTEM — Clean Clinical Light
+   ───────────────────────────────────────────── */
+:root {
+  /* Neutrals */
+  --white:    #ffffff;
+  --gray-50:  #f8f9fa;
+  --gray-100: #f1f3f4;
+  --gray-200: #e8eaed;
+  --gray-300: #dadce0;
+  --gray-400: #bdc1c6;
+  --gray-500: #80868b;
+  --gray-700: #3c4043;
+  --gray-900: #202124;
+
+  /* OLZ — teal/green */
+  --olz:       #1e7e52;
+  --olz-light: #e6f4ec;
+  --olz-mid:   #a8d5bc;
+  --olz-vivid: #1e7e52;
+
+  /* CPZ — warm amber */
+  --cpz:       #b06000;
+  --cpz-light: #fff3e0;
+  --cpz-mid:   #ffcc80;
+  --cpz-vivid: #e65100;
+
+  /* Accents */
+  --blue:      #1a73e8;
+  --blue-light:#e8f0fe;
+  --blue-mid:  #aecbfa;
+  --purple:    #7c4dff;
+  --purple-light: #f3e8fd;
+
+  /* Status */
+  --red:       #c5221f;
+  --red-light: #fce8e6;
+  --amber:     #e37400;
+  --amber-light:#fef7e0;
+
+  /* Typography */
+  --font:  'Outfit', system-ui, sans-serif;
+  --mono:  'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --radius-sm: 8px;
+  --radius:    12px;
+  --radius-lg: 16px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.07);
+  --shadow-sm: 0 1px 6px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--gray-50);
+  color: var(--gray-900);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-xs);
+}
+.header-icon {
+  width: 36px; height: 36px;
+  background: var(--olz);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  color: white;
+  flex-shrink: 0;
+}
+.header-text h1 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-900);
+  letter-spacing: -0.2px;
+}
+.header-text p {
+  font-size: 11px;
+  color: var(--gray-500);
+  font-family: var(--mono);
+  margin-top: 1px;
+}
+.header-add-btn {
+  background: var(--olz);
+  border: none;
+  color: white;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.header-add-btn:hover { background: #15572f; }
+.header-badge {
+  margin-left: auto;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* ── MAIN ── */
+main {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 32px 56px;
+}
+
+/* ── GUIDE BAR ── */
+.instructions {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-left: 4px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-xs);
+}
+.instructions span.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--blue);
+  background: var(--blue-light);
+  padding: 3px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.step-list {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--gray-700);
+}
+.step-num {
+  width: 20px; height: 20px;
+  background: var(--blue);
+  color: white;
+  border-radius: 50%;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── PATIENT CARD ── */
+.patient-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.patient-card:focus-within {
+  border-color: var(--gray-300);
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.15s;
+}
+
+.card-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-500);
+  background: var(--gray-200);
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* patient ID input styled as plain text */
+input.card-id-display {
+  font-family: var(--font) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--gray-900) !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  flex: 1 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+input.card-id-display::placeholder { color: var(--gray-400); font-weight: 400; }
+
+.card-totals {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.total-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 20px;
+  min-width: 100px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.total-badge.olz {
+  background: var(--olz-light);
+  color: var(--olz-vivid);
+  border: 1px solid var(--olz-mid);
+}
+.total-badge.cpz {
+  background: var(--cpz-light);
+  color: var(--cpz-vivid);
+  border: 1px solid var(--cpz-mid);
+}
+.total-badge.empty {
+  background: var(--gray-100);
+  color: var(--gray-400);
+  border: 1px solid var(--gray-200);
+}
+.card-toggle {
+  color: var(--gray-400);
+  font-size: 14px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.card-toggle.open { transform: rotate(180deg); }
+
+.card-body {
+  padding: 16px;
+  display: none;
+  gap: 12px;
+}
+.card-body.open {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+}
+
+/* ── DRUG BLOCK ── */
+.drug-block {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+.block-title {
+  padding: 9px 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.block-title.oral {
+  background: var(--blue-light);
+  color: var(--blue);
+  border-bottom-color: var(--blue-mid);
+}
+.block-title.lai {
+  background: var(--purple-light);
+  color: var(--purple);
+  border-bottom-color: #c8a8f8;
+}
+.block-title::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.block-title.oral::before { background: var(--blue); }
+.block-title.lai::before  { background: var(--purple); }
+
+.block-fields {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.field-row { display: flex; flex-direction: column; gap: 5px; }
+.field-row label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── FORM CONTROLS ── */
+select, input[type="number"], input[type="text"] {
+  width: 100%;
+  background: var(--white);
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  color: var(--gray-900);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2380868b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+select option { background: white; color: var(--gray-900); }
+select:focus, input[type="number"]:focus, input[type="text"]:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26,115,232,0.12);
+  background: white;
+}
+input[type="number"]::placeholder { color: var(--gray-400); }
+
+/* ── RESULT BOXES ── */
+.results-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 2px;
+}
+.result-box {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.result-box.olz {
+  background: var(--olz-light);
+  border: 1.5px solid var(--olz-mid);
+}
+.result-box.cpz {
+  background: var(--cpz-light);
+  border: 1.5px solid var(--cpz-mid);
+}
+.result-box .result-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.result-box.olz .result-label { color: var(--olz); }
+.result-box.cpz .result-label { color: var(--cpz-vivid); }
+.result-box .result-value {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+.result-box.olz .result-value { color: var(--olz-vivid); }
+.result-box.cpz .result-value { color: var(--cpz-vivid); }
+.result-box .result-unit {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--gray-500);
+}
+
+/* ── TOTAL BLOCK ── */
+.total-block {
+  background: var(--white);
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.total-block .block-title {
+  background: var(--gray-900);
+  color: white;
+  border-bottom-color: transparent;
+}
+.total-block .block-title::before { background: #7ee787; }
+.total-inner {
+  padding: 14px 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.total-main {
+  padding: 14px 12px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.total-main.olz {
+  background: var(--olz-light);
+  border: 1.5px solid var(--olz-mid);
+}
+.total-main.cpz {
+  background: var(--cpz-light);
+  border: 1.5px solid var(--cpz-mid);
+}
+.total-main .t-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.total-main.olz .t-label { color: var(--olz); }
+.total-main.cpz .t-label { color: var(--cpz-vivid); }
+.total-main .t-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1;
+}
+.total-main.olz .t-value { color: var(--olz-vivid); }
+.total-main.cpz .t-value { color: var(--cpz-vivid); }
+.total-main .t-unit {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--gray-500);
+}
+.flag-row { grid-column: 1 / -1; }
+.flag {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.flag.ok   { background: var(--olz-light); border: 1px solid var(--olz-mid); color: var(--olz-vivid); }
+.flag.est  { background: var(--amber-light); border: 1px solid #ffcc02; color: var(--amber); }
+.flag.miss { background: var(--red-light); border: 1px solid #f4b8b7; color: var(--red); }
+
+/* ── ADD PATIENT BUTTON ── */
+.add-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--white);
+  border: 1.5px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  color: var(--gray-500);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.add-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+  box-shadow: var(--shadow-xs);
+}
+
+/* ── SUMMARY SECTION ── */
+.summary-section {
+  margin-top: 36px;
+  border-top: 1px solid var(--gray-200);
+  padding-top: 24px;
+}
+.section-heading {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.2px;
+}
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.summary-table th {
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 10px 14px;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gray-500);
+}
+.summary-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--gray-100);
+  color: var(--gray-700);
+}
+.summary-table tr:last-child td { border-bottom: none; }
+.summary-table tr:hover td { background: var(--gray-50); }
+.val-olz {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--olz-vivid) !important;
+}
+.val-cpz {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--cpz-vivid) !important;
+}
+.val-na  { color: var(--gray-400) !important; }
+
+/* ── EXPORT BAR ── */
+.export-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1.5px solid;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+.btn-primary:hover { background: #1557b0; border-color: #1557b0; }
+.btn-ghost {
+  background: transparent;
+  border-color: var(--gray-300);
+  color: var(--gray-700);
+}
+.btn-ghost:hover { border-color: var(--gray-400); background: var(--gray-100); }
+
+/* ── REFERENCE PANEL ── */
+.ref-panel {
+  margin-top: 36px;
+  border-top: 1px solid var(--gray-200);
+  padding-top: 24px;
+}
+.ref-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 820px) { .ref-grid { grid-template-columns: 1fr; } }
+
+.ref-table-wrap {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.ref-table-title {
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-700);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-green { background: var(--olz); }
+.dot-amber { background: var(--cpz-vivid); }
+
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.ref-table th {
+  padding: 7px 14px;
+  background: var(--gray-50);
+  color: var(--gray-500);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 1px solid var(--gray-200);
+  font-weight: 500;
+}
+.ref-table td {
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--gray-100);
+  color: var(--gray-700);
+}
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table tr:hover td { background: var(--gray-50); }
+.tag-l2020 {
+  font-size: 9px;
+  font-family: var(--mono);
+  background: var(--olz-light);
+  color: var(--olz-vivid);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.tag-est {
+  font-size: 9px;
+  font-family: var(--mono);
+  background: var(--amber-light);
+  color: var(--amber);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 680px) {
+  header { padding: 0 16px; }
+  main { padding: 16px 14px 40px; }
+  .card-body.open { grid-template-columns: 1fr; }
+  .ref-grid { grid-template-columns: 1fr; }
+  .step-list { gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">⚕</div>
+  <div class="header-text">
+    <h1>Antipsychotic Dose Equivalent Calculator</h1>
+    <p>OLZ eq · Leucht et al. 2020 &nbsp;|&nbsp; CPZ eq · Gardner et al. 2010</p>
+  </div>
+  <button class="header-add-btn" onclick="addPatient()">+ Add patient</button>
+  <div class="header-badge">v2.0</div>
+</header>
+
+<main>
+
+  <div class="instructions">
+    <span class="label">GUIDE</span>
+    <div>
+      <div class="step-list">
+        <div class="step"><span class="step-num">1</span> Select a drug from the dropdown</div>
+        <div class="step"><span class="step-num">2</span> Enter the dose in mg/day</div>
+        <div class="step"><span class="step-num">3</span> For LAI: enter total dose + interval in days</div>
+        <div class="step"><span class="step-num">4</span> Results update instantly — OLZ <span style="color:var(--olz-vivid);font-weight:600">green</span>, CPZ <span style="color:var(--cpz-vivid);font-weight:600">amber</span></div>
+        <div class="step"><span class="step-num">5</span> Export the summary table as CSV</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="patients-container"></div>
+
+  <div class="summary-section">
+    <div class="section-heading">Patient Summary</div>
+    <table class="summary-table" id="summary-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Patient ID</th>
+          <th>APS 1</th>
+          <th>APS 2</th>
+          <th>APS 3</th>
+          <th>LAI</th>
+          <th>TOT OLZ eq/day</th>
+          <th>TOT CPZ eq/day</th>
+          <th>Flag</th>
+        </tr>
+      </thead>
+      <tbody id="summary-body"></tbody>
+    </table>
+    <div class="export-bar">
+      <button class="btn btn-primary" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-ghost"   onclick="clearAll()">🗑 Clear all</button>
+    </div>
+  </div>
+
+  <div class="ref-panel">
+    <div class="section-heading">Conversion Factor Reference</div>
+    <div class="ref-grid">
+      <div class="ref-table-wrap">
+        <div class="ref-table-title">
+          <span class="dot dot-green"></span>
+          OLZ equivalents — Leucht et al. 2020
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Drug</th><th>Factor (mg = 1 mg OLZ)</th><th>Source</th></tr></thead>
+          <tbody id="ref-olz-body"></tbody>
+        </table>
+      </div>
+      <div class="ref-table-wrap">
+        <div class="ref-table-title">
+          <span class="dot dot-amber"></span>
+          CPZ equivalents — Gardner et al. 2010
+        </div>
+        <table class="ref-table">
+          <thead><tr><th>Drug</th><th>Factor (mg = 100 mg CPZ)</th><th>Ex: 10 mg → CPZ eq</th></tr></thead>
+          <tbody id="ref-cpz-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div style="margin-top:12px; font-family:var(--mono); font-size:10px; color:var(--gray-500); line-height:1.8;">
+      <span style="color:var(--olz); margin-right:4px">●</span> Leucht 2020 (Am J Psychiatry 177:342–353) &nbsp;|&nbsp;
+      <span style="color:var(--cpz-vivid); margin-right:4px">●</span> Gardner 2010 (Am J Psychiatry 167:686–693) &nbsp;|&nbsp;
+      <span style="color:var(--amber); margin-right:4px">●</span> Estimate / other source
+    </div>
+  </div>
+
+</main>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+const OLZ = {
+  "Olanzapina":      { f: 2.40,   src: "Leucht 2020" },
+  "Risperidone":     { f: 1.00,   src: "Leucht 2020" },
+  "Aloperidolo":     { f: 0.421,  src: "Leucht 2020" },
+  "Aripiprazolo":    { f: 0.750,  src: "Leucht 2020" },
+  "Quetiapina":      { f: 32.08,  src: "Leucht 2020" },
+  "Amisulpride":     { f: 35.75,  src: "Leucht 2020" },
+  "Paliperidone":    { f: 0.875,  src: "Leucht 2020" },
+  "Lurasidone":      { f: 9.79,   src: "Leucht 2020" },
+  "Ziprasidone":     { f: 12.50,  src: "Leucht 2020" },
+  "Brexpiprazolo":   { f: 0.225,  src: "Leucht 2020" },
+  "Clozapina":       { f: 25.00,  src: "Leucht 2016*" },
+  "Clorpromazina":   { f: 25.00,  src: "Gardner 2010*" },
+  "Perfenazina":     { f: 2.50,   src: "Leucht 2014*" },
+  "Zuclopentixolo":  { f: 4.00,   src: "Leucht 2014*" },
+  "Levomepromazina": { f: 25.00,  src: "Stima*" },
+  "Clotiapina":      { f: 10.00,  src: "Stima*" },
+  "Cariprazina":     { f: 0.530,  src: "Stima*" },
+  "Promazina":       { f: 50.00,  src: "Stima*" },
+  "Pimozide":        { f: 0.421,  src: "Leucht 2014*" },
+  "Levosulpiride":   { f: 35.75,  src: "Stima*" },
+  "Flufenazina":     { f: 0.500,  src: "Leucht 2014*" },
+};
+
+const CPZ = {
+  "Olanzapina":      4.0,
+  "Risperidone":     2.0,
+  "Aripiprazolo":    7.5,
+  "Quetiapina":      75.0,
+  "Aloperidolo":     2.0,
+  "Clozapina":       50.0,
+  "Paliperidone":    2.0,
+  "Amisulpride":     83.3,
+  "Perfenazina":     9.41,
+  "Ziprasidone":     60.0,
+  "Clorpromazina":   100.0,
+  "Flufenazina":     2.0,
+  "Zuclopentixolo":  25.0,
+  "Levomepromazina": 100.0,
+  "Clotiapina":      50.0,
+  "Lurasidone":      33.3,
+  "Brexpiprazolo":   4.0,
+  "Cariprazina":     1.5,
+  "Promazina":       200.0,
+  "Pimozide":        2.0,
+  "Levosulpiride":   83.3,
+};
+
+// LAI: PK factor, base drug for OLZ, base drug for CPZ
+const LAI = {
+  "Risperidone LAI (Risperdal Consta)": { pk: 2.41,  baseOLZ: "Risperidone",  baseCPZ: "Risperidone" },
+  "Paliperidone LAI 1M":                { pk: 0.747, baseOLZ: "Paliperidone", baseCPZ: "Paliperidone" },
+  "Paliperidone LAI 3M":                { pk: 0.747, baseOLZ: "Paliperidone", baseCPZ: "Paliperidone" },
+  "Aripiprazolo LAI":                   { pk: 1.05,  baseOLZ: "Aripiprazolo", baseCPZ: "Aripiprazolo" },
+  "Aloperidolo decanoato":              { pk: 2.0,   baseOLZ: "Aloperidolo",  baseCPZ: "Aloperidolo" },
+  "Flufenazina decanoato":              { pk: 5.6,   baseOLZ: "Flufenazina",  baseCPZ: "Flufenazina" },
+  "Zuclopentixolo LAI":                 { pk: 2.1,   baseOLZ: "Zuclopentixolo",baseCPZ:"Zuclopentixolo"},
+  "Olanzapina LAI (ZypAdhera)":         { pk: 0.389, baseOLZ: "Olanzapina",   baseCPZ: "Olanzapina" },
+};
+
+const ORAL_DRUGS = Object.keys(OLZ);
+const LAI_DRUGS  = Object.keys(LAI);
+let patientCount = 0;
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULATIONS
+// ═══════════════════════════════════════════════════════════════
+function calcOLZ(drug, dose) {
+  if (!drug || !dose || drug === "N/A") return null;
+  const d = OLZ[drug];
+  if (!d) return null;
+  return { val: dose / d.f, est: d.src.includes("*") };
+}
+
+function calcCPZ(drug, dose) {
+  if (!drug || !dose || drug === "N/A") return null;
+  const f = CPZ[drug];
+  if (!f) return null;
+  return { val: (dose / f) * 100, est: false };
+}
+
+function calcLAI(drug, dose, freq) {
+  if (!drug || !dose || !freq || drug === "N/A") return null;
+  const d = LAI[drug];
+  if (!d) return null;
+  const dailyOral = (dose / freq) * d.pk;
+  const olzF = OLZ[d.baseOLZ];
+  const cpzF = CPZ[d.baseCPZ];
+  return {
+    olz: olzF ? { val: dailyOral / olzF.f, est: olzF.src.includes("*") } : null,
+    cpz: cpzF ? { val: (dailyOral / cpzF) * 100, est: false } : null,
+  };
+}
+
+function fmt(v) {
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  return v.toFixed(2);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD SELECT OPTIONS
+// ═══════════════════════════════════════════════════════════════
+function makeOralSelect(id, onchange) {
+  const s = document.createElement("select");
+  s.id = id;
+  s.onchange = onchange;
+  s.innerHTML = `<option value="">— select drug —</option>
+    <option value="N/A">N/A</option>` +
+    ORAL_DRUGS.map(d => `<option value="${d}">${d}</option>`).join("");
+  return s;
+}
+
+function makeLAISelect(id, onchange) {
+  const s = document.createElement("select");
+  s.id = id;
+  s.onchange = onchange;
+  s.innerHTML = `<option value="">— select LAI —</option>
+    <option value="N/A">N/A</option>` +
+    LAI_DRUGS.map(d => `<option value="${d}">${d}</option>`).join("");
+  return s;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PATIENT CARD
+// ═══════════════════════════════════════════════════════════════
+function addPatient() {
+  patientCount++;
+  const pid = `p${patientCount}`;
+  const container = document.getElementById("patients-container");
+
+  const card = document.createElement("div");
+  card.className = "patient-card";
+  card.id = `card-${pid}`;
+
+  card.innerHTML = `
+    <div class="card-header">
+      <span class="card-num">${String(patientCount).padStart(2,"0")}</span>
+      <input type="text" id="${pid}-id" class="card-id-display" placeholder="Patient ID..."
+             oninput="updateSummary()">
+      <div class="card-totals">
+        <span class="total-badge empty" id="${pid}-badge-olz">OLZ: —</span>
+        <span class="total-badge empty" id="${pid}-badge-cpz">CPZ: —</span>
+      </div>
+    </div>
+    <div class="card-body open" id="${pid}-body"></div>
+  `;
+
+  container.appendChild(card);
+
+  const body = document.getElementById(`${pid}-body`);
+
+  // APS 1, 2, 3
+  [1, 2, 3].forEach(n => {
+    body.appendChild(buildOralBlock(pid, n));
+  });
+
+  // LAI
+  body.appendChild(buildLAIBlock(pid));
+
+  // Total block
+  body.appendChild(buildTotalBlock(pid));
+
+  updateCard(pid);
+  updateSummary();
+}
+
+function buildOralBlock(pid, n) {
+  const wrap = document.createElement("div");
+  wrap.className = "drug-block";
+  wrap.innerHTML = `
+    <div class="block-title oral">Antipsychotic ${n} — oral</div>
+    <div class="block-fields" id="${pid}-aps${n}-fields">
+      <div class="field-row">
+        <label>Drug</label>
+      </div>
+      <div class="field-row">
+        <label>Dose mg/day</label>
+        <input type="number" id="${pid}-aps${n}-dose" min="0" step="0.5" placeholder="es. 10"
+               oninput="updateCard('${pid}')">
+      </div>
+      <div class="results-row">
+        <div class="result-box olz">
+          <span class="result-label">OLZ eq</span>
+          <span class="result-value" id="${pid}-aps${n}-olz">—</span>
+          <span class="result-unit">mg OLZ/day</span>
+        </div>
+        <div class="result-box cpz">
+          <span class="result-label">CPZ eq</span>
+          <span class="result-value" id="${pid}-aps${n}-cpz">—</span>
+          <span class="result-unit">mg CPZ/day</span>
+        </div>
+      </div>
+    </div>
+  `;
+  // Insert select
+  const fieldRow = wrap.querySelector(".block-fields .field-row");
+  const sel = makeOralSelect(`${pid}-aps${n}-drug`, () => updateCard(pid));
+  fieldRow.appendChild(sel);
+  return wrap;
+}
+
+function buildLAIBlock(pid) {
+  const wrap = document.createElement("div");
+  wrap.className = "drug-block";
+  wrap.innerHTML = `
+    <div class="block-title lai">LAI — Long-Acting Injectable</div>
+    <div class="block-fields">
+      <div class="field-row">
+        <label>LAI formulation</label>
+      </div>
+      <div class="field-row">
+        <label>Total dose (mg)</label>
+        <input type="number" id="${pid}-lai-dose" min="0" step="0.5" placeholder="es. 150"
+               oninput="updateCard('${pid}')">
+      </div>
+      <div class="field-row">
+        <label>Interval (days)</label>
+        <input type="number" id="${pid}-lai-freq" min="1" step="1" placeholder="es. 28"
+               oninput="updateCard('${pid}')">
+      </div>
+      <div class="results-row">
+        <div class="result-box olz">
+          <span class="result-label">OLZ eq</span>
+          <span class="result-value" id="${pid}-lai-olz">—</span>
+          <span class="result-unit">mg OLZ/day</span>
+        </div>
+        <div class="result-box cpz">
+          <span class="result-label">CPZ eq</span>
+          <span class="result-value" id="${pid}-lai-cpz">—</span>
+          <span class="result-unit">mg CPZ/day</span>
+        </div>
+      </div>
+    </div>
+  `;
+  const fieldRow = wrap.querySelector(".block-fields .field-row");
+  const sel = makeLAISelect(`${pid}-lai-drug`, () => updateCard(pid));
+  fieldRow.appendChild(sel);
+  return wrap;
+}
+
+function buildTotalBlock(pid) {
+  const wrap = document.createElement("div");
+  wrap.className = "total-block";
+  wrap.innerHTML = `
+    <div class="block-title">⬡ Daily Total</div>
+    <div class="total-inner">
+      <div class="total-main olz">
+        <span class="t-label">OLZ equivalents/day</span>
+        <span class="t-value" id="${pid}-tot-olz">—</span>
+        <span class="t-unit">mg olanzapine equivalents</span>
+      </div>
+      <div class="total-main cpz">
+        <span class="t-label">CPZ equivalents/day</span>
+        <span class="t-value" id="${pid}-tot-cpz">—</span>
+        <span class="t-unit">mg chlorpromazine eq.</span>
+      </div>
+      <div class="flag-row" id="${pid}-flags"></div>
+    </div>
+  `;
+  return wrap;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UPDATE LOGIC
+// ═══════════════════════════════════════════════════════════════
+function updateCard(pid) {
+  let totOLZ = 0, totCPZ = 0;
+  let hasEst = false, hasMissing = false;
+
+  // Oral APS 1-3
+  [1,2,3].forEach(n => {
+    const drug = document.getElementById(`${pid}-aps${n}-drug`)?.value;
+    const dose = parseFloat(document.getElementById(`${pid}-aps${n}-dose`)?.value);
+    const olzEl = document.getElementById(`${pid}-aps${n}-olz`);
+    const cpzEl = document.getElementById(`${pid}-aps${n}-cpz`);
+
+    const olzR = calcOLZ(drug, dose);
+    const cpzR = calcCPZ(drug, dose);
+
+    if (olzEl) olzEl.textContent = olzR ? olzR.val.toFixed(2) : "—";
+    if (cpzEl) cpzEl.textContent = cpzR ? cpzR.val.toFixed(1) : "—";
+
+    if (drug && drug !== "" && drug !== "N/A") {
+      if (!olzR) hasMissing = true;
+      else { totOLZ += olzR.val; if (olzR.est) hasEst = true; }
+      if (!cpzR) hasMissing = true;
+      else totCPZ += cpzR.val;
+    }
+  });
+
+  // LAI
+  const laiDrug = document.getElementById(`${pid}-lai-drug`)?.value;
+  const laiDose = parseFloat(document.getElementById(`${pid}-lai-dose`)?.value);
+  const laiFreq = parseFloat(document.getElementById(`${pid}-lai-freq`)?.value);
+  const laiOlzEl = document.getElementById(`${pid}-lai-olz`);
+  const laiCpzEl = document.getElementById(`${pid}-lai-cpz`);
+
+  const laiR = calcLAI(laiDrug, laiDose, laiFreq);
+  if (laiOlzEl) laiOlzEl.textContent = laiR?.olz ? laiR.olz.val.toFixed(2) : "—";
+  if (laiCpzEl) laiCpzEl.textContent = laiR?.cpz ? laiR.cpz.val.toFixed(1) : "—";
+
+  if (laiDrug && laiDrug !== "" && laiDrug !== "N/A") {
+    if (!laiDose || !laiFreq) hasMissing = true;
+    else if (laiR?.olz) { totOLZ += laiR.olz.val; if (laiR.olz.est) hasEst = true; }
+    else hasMissing = true;
+    if (laiR?.cpz) totCPZ += laiR.cpz.val;
+  }
+
+  // Totals
+  const hasAny = [1,2,3].some(n => {
+    const d = document.getElementById(`${pid}-aps${n}-drug`)?.value;
+    return d && d !== "" && d !== "N/A";
+  }) || (laiDrug && laiDrug !== "" && laiDrug !== "N/A");
+
+  const totOlzEl = document.getElementById(`${pid}-tot-olz`);
+  const totCpzEl = document.getElementById(`${pid}-tot-cpz`);
+  if (totOlzEl) totOlzEl.textContent = hasAny ? totOLZ.toFixed(2) : "—";
+  if (totCpzEl) totCpzEl.textContent = hasAny ? totCPZ.toFixed(1) : "—";
+
+  // Badges in header
+  const badgeOlz = document.getElementById(`${pid}-badge-olz`);
+  const badgeCpz = document.getElementById(`${pid}-badge-cpz`);
+  if (badgeOlz) {
+    badgeOlz.textContent = hasAny ? `OLZ: ${totOLZ.toFixed(2)}` : "OLZ: —";
+    badgeOlz.className = `total-badge ${hasAny ? "olz" : "empty"}`;
+  }
+  if (badgeCpz) {
+    badgeCpz.textContent = hasAny ? `CPZ: ${totCPZ.toFixed(1)}` : "CPZ: —";
+    badgeCpz.className = `total-badge ${hasAny ? "cpz" : "empty"}`;
+  }
+
+  // Flags
+  const flagsEl = document.getElementById(`${pid}-flags`);
+  if (flagsEl) {
+    let flags = "";
+    if (hasMissing) flags += `<span class="flag miss">⚠ Missing data — exclude from dose analyses</span> `;
+    if (hasEst)     flags += `<span class="flag est">~ Estimated factor (not from Leucht 2020 directly)</span> `;
+    if (!hasMissing && !hasEst && hasAny) flags = `<span class="flag ok">✓ Complete · Leucht 2020</span>`;
+    flagsEl.innerHTML = flags;
+  }
+
+  updateSummary();
+}
+
+function toggleCard(pid) { /* collapsed mode disabled */ }
+
+// ═══════════════════════════════════════════════════════════════
+// SUMMARY TABLE
+// ═══════════════════════════════════════════════════════════════
+function updateSummary() {
+  const tbody = document.getElementById("summary-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  for (let i = 1; i <= patientCount; i++) {
+    const pid = `p${i}`;
+    if (!document.getElementById(`card-${pid}`)) continue;
+
+    const patId = document.getElementById(`${pid}-id`)?.value || `Patient ${i}`;
+
+    const aps = [1,2,3].map(n => {
+      const d = document.getElementById(`${pid}-aps${n}-drug`)?.value;
+      const dose = document.getElementById(`${pid}-aps${n}-dose`)?.value;
+      return d && d !== "" && d !== "N/A" ? `${d} ${dose||"?"}mg` : "—";
+    });
+
+    const laiDrug = document.getElementById(`${pid}-lai-drug`)?.value;
+    const laiDose = document.getElementById(`${pid}-lai-dose`)?.value;
+    const laiFreq = document.getElementById(`${pid}-lai-freq`)?.value;
+    const laiStr = laiDrug && laiDrug !== "" && laiDrug !== "N/A"
+      ? `${laiDrug} ${laiDose||"?"}mg/${laiFreq||"?"}d` : "—";
+
+    const totOlz = document.getElementById(`${pid}-tot-olz`)?.textContent || "—";
+    const totCpz = document.getElementById(`${pid}-tot-cpz`)?.textContent || "—";
+
+    const flags = document.getElementById(`${pid}-flags`)?.textContent || "";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td>${patId}</td>
+      <td>${aps[0]}</td>
+      <td>${aps[1]}</td>
+      <td>${aps[2]}</td>
+      <td style="font-size:10px">${laiStr}</td>
+      <td class="${totOlz !== "—" ? "val-olz" : "val-na"}">${totOlz}</td>
+      <td class="${totCpz !== "—" ? "val-cpz" : "val-na"}">${totCpz}</td>
+      <td style="font-size:10px; color:var(--text3)">${flags}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════════════════════
+function exportCSV() {
+  const rows = [["#","ID","APS1","Dose_APS1","APS2","Dose_APS2","APS3","Dose_APS3",
+                 "LAI","Dose_LAI","Freq_LAI",
+                 "OLZ_eq_APS1","CPZ_eq_APS1","OLZ_eq_APS2","CPZ_eq_APS2",
+                 "OLZ_eq_APS3","CPZ_eq_APS3","OLZ_eq_LAI","CPZ_eq_LAI",
+                 "TOT_OLZ_eq","TOT_CPZ_eq","Flags"]];
+
+  for (let i = 1; i <= patientCount; i++) {
+    const pid = `p${i}`;
+    if (!document.getElementById(`card-${pid}`)) continue;
+    const id = document.getElementById(`${pid}-id`)?.value || "";
+
+    const getD = n => document.getElementById(`${pid}-aps${n}-drug`)?.value || "";
+    const getDose = n => document.getElementById(`${pid}-aps${n}-dose`)?.value || "";
+    const getOlz = n => document.getElementById(`${pid}-aps${n}-olz`)?.textContent || "";
+    const getCpz = n => document.getElementById(`${pid}-aps${n}-cpz`)?.textContent || "";
+
+    const lD = document.getElementById(`${pid}-lai-drug`)?.value || "";
+    const lDose = document.getElementById(`${pid}-lai-dose`)?.value || "";
+    const lFreq = document.getElementById(`${pid}-lai-freq`)?.value || "";
+    const lOlz = document.getElementById(`${pid}-lai-olz`)?.textContent || "";
+    const lCpz = document.getElementById(`${pid}-lai-cpz`)?.textContent || "";
+    const totO = document.getElementById(`${pid}-tot-olz`)?.textContent || "";
+    const totC = document.getElementById(`${pid}-tot-cpz`)?.textContent || "";
+    const flags = document.getElementById(`${pid}-flags`)?.textContent || "";
+
+    rows.push([i, id,
+      getD(1), getDose(1), getD(2), getDose(2), getD(3), getDose(3),
+      lD, lDose, lFreq,
+      getOlz(1), getCpz(1), getOlz(2), getCpz(2),
+      getOlz(3), getCpz(3), lOlz, lCpz,
+      totO, totC, flags
+    ]);
+  }
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "AP_equivalents.csv";
+  a.click();
+}
+
+function clearAll() {
+  if (!confirm("Clear all patient data?")) return;
+  document.getElementById("patients-container").innerHTML = "";
+  document.getElementById("summary-body").innerHTML = "";
+  patientCount = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REFERENCE TABLES
+// ═══════════════════════════════════════════════════════════════
+function buildRefTables() {
+  const olzBody = document.getElementById("ref-olz-body");
+  Object.entries(OLZ).forEach(([name, d]) => {
+    const est = d.src.includes("*");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td style="text-align:right; font-weight:600; color:${est?"var(--orange-dim)":"var(--green-bright)"}">${d.f.toFixed(3)}</td>
+      <td><span class="${est ? "tag-est" : "tag-l2020"}">${d.src}</span></td>
+    `;
+    olzBody.appendChild(tr);
+  });
+
+  const cpzBody = document.getElementById("ref-cpz-body");
+  Object.entries(CPZ).forEach(([name, f]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${name}</td>
+      <td style="text-align:right; font-weight:600; color:var(--amber-bright)">${f.toFixed(1)}</td>
+      <td style="color:var(--text2); font-size:10px">${(10/f*100).toFixed(1)} mg CPZ</td>
+    `;
+    cpzBody.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+buildRefTables();
+addPatient(); // Start with 1 patient open
+</script>
+</body>
+</html>
